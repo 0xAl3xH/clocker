@@ -97,7 +97,15 @@ extension TimezoneDataOperations {
             subtitle.isEmpty ? subtitle.append("\(date)") : subtitle.append(" \(date)")
         }
 
-        return subtitle.isEmpty ? dataObject.formattedTimezoneLabel() : subtitle
+        let logObject: [String: Any] = ["Longitude": dataObject.longitude as Any,
+                                        "Latitude": dataObject.latitude as Any,
+                                        "Selection": dataObject.selectionType as Any,
+                                        "Address": dataObject.formattedAddress as Any]
+        Logger.log(object: logObject, for: "@@@@@@@@@@@@@Menu called@@@@@@@@@@@@")
+
+        subtitle = subtitle.isEmpty ? dataObject.formattedTimezoneLabel() : subtitle
+        subtitle.append(" |🌤75°")
+        return subtitle
     }
 
     func compactMenuSubtitle() -> String {
