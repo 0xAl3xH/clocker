@@ -100,11 +100,15 @@ extension TimezoneDataOperations {
         let logObject: [String: Any] = ["Longitude": dataObject.longitude as Any,
                                         "Latitude": dataObject.latitude as Any,
                                         "Selection": dataObject.selectionType as Any,
+                                        "Temp": dataObject.temp as Any,
                                         "Address": dataObject.formattedAddress as Any]
         Logger.log(object: logObject, for: "@@@@@@@@@@@@@Menu called@@@@@@@@@@@@")
 
+        _ = dataObject.fetchWeather(lat:dataObject.latitude!, long:dataObject.longitude!)
+
         subtitle = subtitle.isEmpty ? dataObject.formattedTimezoneLabel() : subtitle
-        subtitle.append(" |🌤75°")
+        subtitle.append(" 🌤")
+        subtitle.append(dataObject.temp != nil ? String(Int(dataObject.temp!)) + "°": "???")
         return subtitle
     }
 
@@ -126,6 +130,8 @@ extension TimezoneDataOperations {
         }
 
         subtitle.isEmpty ? subtitle.append(time(with: 0)) : subtitle.append(" \(time(with: 0))")
+        // subtitle.append(" 🌤")
+        // subtitle.append(dataObject.temp != nil ? String(Int(dataObject.temp!)) + "°": "??")
 
         return subtitle
     }

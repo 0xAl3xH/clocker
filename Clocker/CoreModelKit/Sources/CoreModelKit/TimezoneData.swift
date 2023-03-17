@@ -84,6 +84,7 @@ public class TimezoneData: NSObject, NSCoding {
     public var selectionType: SelectionType = .city
     public var isSystemTimezone = false
     public var overrideFormat: TimezoneOverride = .globalFormat
+    public var temp: Double?
 
     override public init() {
         selectionType = .timezone
@@ -138,6 +139,50 @@ public class TimezoneData: NSObject, NSCoding {
 
         return nil
     }
+
+    public func fetchWeather(lat: Double, long: Double) -> Double {
+        struct WeatherCurrent: Decodable {
+            let temp_f: Double
+        }
+        struct WeatherResponse: Decodable {
+            let current: WeatherCurrent
+        }
+        // latitude + longitude
+        let latitude = String(lat);
+        let longitude = String(long);
+        let api = "http://api.weatherapi.com/v1/current.json?key=630d5be7e02f46cc9d9164723231603&q="
+        let url = URL(string: api + latitude + "," + longitude)!
+
+        print(lat, long, url)
+
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+    
+            // Check if Error took place 
+            if let error = error {
+                print("Error took place \(error)")
+                return
+            }
+            
+            // Read HTTP Response Status code 
+            if let response = response as? HTTPURLResponse {
+                print("Response HTTP Status code: \(response.statusCode)")
+            }
+            
+            // Convert HTTP Response Data to a simple String 
+            if let data = data, let dataString = String(data: data, encoding: .utf8) {
+                print("Response data string:\n \(dataString)")
+                let json = try! JSONDecoder().decode(WeatherResponse.self, from:data) 
+                self.temp = json.current.temp_f
+                print(self.temp)
+            }
+        
+        }
+
+        task.resume()
+
+        return 0.0
+    }
+
 
     public func encode(with aCoder: NSCoder) {
         aCoder.encode(placeID, forKey: "place_id")
