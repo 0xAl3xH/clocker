@@ -104,11 +104,14 @@ extension TimezoneDataOperations {
                                         "Address": dataObject.formattedAddress as Any]
         Logger.log(object: logObject, for: "@@@@@@@@@@@@@Menu called@@@@@@@@@@@@")
 
-        _ = dataObject.fetchWeather(lat:dataObject.latitude!, long:dataObject.longitude!)
-
         subtitle = subtitle.isEmpty ? dataObject.formattedTimezoneLabel() : subtitle
-        subtitle.append(" 🌤")
-        subtitle.append(dataObject.temp != nil ? String(Int(dataObject.temp!)) + "°": "???")
+
+        if dataObject.latitude != nil, dataObject.longitude != nil {
+            _ = dataObject.fetchWeather(lat:dataObject.latitude!, long:dataObject.longitude!)
+            subtitle.append(" " + dataObject.weatherIcon)
+            subtitle.append(dataObject.temp != nil ? String(Int(dataObject.temp!)) + "°": "???")
+        }
+
         return subtitle
     }
 

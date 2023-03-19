@@ -85,6 +85,9 @@ public class TimezoneData: NSObject, NSCoding {
     public var isSystemTimezone = false
     public var overrideFormat: TimezoneOverride = .globalFormat
     public var temp: Double?
+    public var weatherIcon: String = "❓"
+
+    private var weatherIcons = ["sunny":"☀️", "cloudy":"🌤", "rain":"☔️", "snow":"❄️", "fog":"🌫", "thunder":"⛈", "unknown":"❓"]
 
     override public init() {
         selectionType = .timezone
@@ -140,9 +143,32 @@ public class TimezoneData: NSObject, NSCoding {
         return nil
     }
 
+    private func getWeatherCondition(code: Int) -> String{
+        switch code {
+            case 1000:
+                return "sunny"
+            case 1003, 1006, 1009:
+                return "cloudy"
+            case 1030, 1135, 1147:
+                return "fog"
+            case 1063, 1072, 1150, 1153, 1168, 1171, 1180, 1183, 1186, 1189, 1192, 1195, 1198, 1201, 1204, 1207, 1240, 1243, 1246, 1249, 1252:
+                return "rain"
+            case 1066, 1069, 1114, 1117, 1210, 1213, 1216, 1219, 1222, 1225, 1237, 1255, 1258, 1261, 1264, 1279, 1282:
+                return "snow"
+            case 1087, 1273, 1276:
+                return "thunder"
+            default:
+                return "unknown"
+        }
+    }
+
     public func fetchWeather(lat: Double, long: Double) -> Double {
+        struct WeatherCondition: Decodable {
+            let code: Int
+        }
         struct WeatherCurrent: Decodable {
             let temp_f: Double
+            let condition: WeatherCondition
         }
         struct WeatherResponse: Decodable {
             let current: WeatherCurrent
@@ -173,7 +199,8 @@ public class TimezoneData: NSObject, NSCoding {
                 print("Response data string:\n \(dataString)")
                 let json = try! JSONDecoder().decode(WeatherResponse.self, from:data) 
                 self.temp = json.current.temp_f
-                print(self.temp)
+                self.weatherIcon = self.weatherIcons[self.getWeatherCondition(code: json.current.condition.code)]!
+                print("@!", self.weatherIcon, self.weatherIcons["unknown"])
             }
         
         }
