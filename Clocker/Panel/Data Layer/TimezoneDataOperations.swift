@@ -97,12 +97,12 @@ extension TimezoneDataOperations {
             subtitle.isEmpty ? subtitle.append("\(date)") : subtitle.append(" \(date)")
         }
 
-        let logObject: [String: Any] = ["Longitude": dataObject.longitude as Any,
-                                        "Latitude": dataObject.latitude as Any,
-                                        "Selection": dataObject.selectionType as Any,
-                                        "Temp": dataObject.temp as Any,
-                                        "Address": dataObject.formattedAddress as Any]
-        Logger.log(object: logObject, for: "@@@@@@@@@@@@@Menu called@@@@@@@@@@@@")
+        // let logObject: [String: Any] = ["Longitude": dataObject.longitude as Any,
+        //                                 "Latitude": dataObject.latitude as Any,
+        //                                 "Selection": dataObject.selectionType as Any,
+        //                                 "Temp": dataObject.temp as Any,
+        //                                 "Address": dataObject.formattedAddress as Any]
+        // Logger.log(object: logObject, for: "@@@@@@@@@@@@@Menu called@@@@@@@@@@@@")
 
         subtitle = subtitle.isEmpty ? dataObject.formattedTimezoneLabel() : subtitle
 

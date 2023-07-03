@@ -56,6 +56,7 @@ protocol StatusItemViewConforming {
 class StatusContainerView: NSView {
     private var previousX: Int = 0
     private let store: DataStore
+    private var tzlist:[TimezoneData] = []
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -101,6 +102,11 @@ class StatusContainerView: NSView {
             var compressedWidth = timezones.reduce(0.0) { result, timezone -> CGFloat in
 
                 if let timezoneObject = TimezoneData.customObject(from: timezone) {
+                    if timezoneObject.latitude != nil, timezoneObject.longitude != nil {
+                        print("Appending timezoneObject to tzlist")
+                        // tzlist.append(timezoneObject);
+                        _ = timezoneObject.fetchWeather(lat: timezoneObject.latitude!, long: timezoneObject.longitude!) // try to get weather data asap
+                    }
                     let precalculatedWidth = Double(compactWidth(for: timezoneObject, with: store))
                     let operationObject = TimezoneDataOperations(with: timezoneObject, store: store)
                     let calculatedSubtitleSize = compactModeTimeFont.size(for: operationObject.compactMenuSubtitle(),
@@ -140,6 +146,26 @@ class StatusContainerView: NSView {
         super.init(frame: frame)
 
         addSubviews()
+        // self.updateTime()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { // trigger re-render after 1 second since we've likely finished fetching weather data TODO make this listen for a "done" flag after the fetch call
+
+        // TODO seems like self.timezones is static encoded data and not a 
+        // reference to the timezone objects so we can't just check if 
+        // all timezones have been updated with temp data to 
+        // trigger re-render, delay is still being used but figure out a 
+        // way in the future to do this in a way similiar to the following
+
+        // let ready = timezones.compactMap({
+        //     (tz: Data) -> Double? in
+        //         if let timezoneObject = TimezoneData.customObject(from: tz) {
+        //             print(timezoneObject.temp ?? "no temp data")
+        //             return timezoneObject.temp
+        //         }
+        //         return nil
+        // })
+        // print(ready)
+        self.updateTime()
+        }
     }
 
     @available(*, unavailable)
@@ -209,6 +235,7 @@ class StatusContainerView: NSView {
     }
 
     func updateTime() {
+        Logger.info("Updating time")
         if subviews.isEmpty {
             assertionFailure("Subviews count should > 0")
         }
