@@ -191,16 +191,21 @@ public class TimezoneData: NSObject, NSCoding {
             
             // Read HTTP Response Status code 
             if let response = response as? HTTPURLResponse {
-                // print("Response HTTP Status code: \(response.statusCode)")
+                print("Response HTTP Status code: \(response.statusCode)")
             }
             
             // Convert HTTP Response Data to a simple String 
-            if let data = data, let dataString = String(data: data, encoding: .utf8) {
+            if let data = data, let _ = String(data: data, encoding: .utf8) {
                 // print("Response data string:\n \(dataString)")
-                let json = try! JSONDecoder().decode(WeatherResponse.self, from:data) 
-                self.temp = json.current.temp_f
-                self.weatherIcon = self.weatherIcons[self.getWeatherCondition(code: json.current.condition.code)]!
-                // print("@!", self.weatherIcon, self.weatherIcons["unknown"])
+                do {
+                    let json = try JSONDecoder().decode(WeatherResponse.self, from:data)
+                    self.temp = json.current.temp_f
+                    self.weatherIcon = self.weatherIcons[self.getWeatherCondition(code: json.current.condition.code)]!
+                    // print("@!", self.weatherIcon, self.weatherIcons["unknown"])
+                } catch {
+                    self.temp = nil
+                    self.weatherIcon = "❓"
+                }
             }
         
         }
